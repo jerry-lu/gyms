@@ -1,8 +1,10 @@
 from gyms.models import Event
+from gyms.config import api_key
+from datetime import datetime
 import re
+import os
 import requests
 import iso8601
-from datetime import datetime
 import time
 
 def to_local(utc_datetime):
