@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <h1>Is Pottruck Open?</h1>
+            <p>It is {% now "h:i, F jS" %} in Philadelphia. Here are the hours of operation today!</p>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        {% for event in events %}
+        <div class="card-deck">
+                <div class="card" style="width: 20rem;">
+                    <img class="card-img-top" src ="/static/img/{{event.name}}.jpg" alt="{{event.name}} image">
+                    <div class="card-body">
+                        {% if event.all_day %}
+                            {% if event.open_now %}
+                                <h5 class="text-success">{{event.name}} – Open</h5>
+                            {% else %}
+                                <h5 class="text-danger">{{event.name}} – Closed</h5>
+                            {% endif %}
+                            <p class="card-text">All Day</p>
+                        {% else %}
+                            {% if event.closing_soon %}
+                                <h5 class="text-warning">{{event.name}} – Closing Soon</h5>
+                            {% elif event.open_now %}
+                                <h5 class="text-success">{{event.name}} – Open</h5>
+                            {% else %}
+                                <h5 class="text-danger">{{event.name}} – Closed</h5>
+                            {% endif %}
+                            <p class="card-text">Hours Today: {{event.start.time}} – {{event.end.time}}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}      
+    </div>
+</div>
+{% endblock %}
