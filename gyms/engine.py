@@ -13,12 +13,14 @@ def to_local(utc_datetime):
     return utc_datetime + offset
 
 def get_events():
+    # insert the api key from teamup.com/api-keys/ 
     resp = requests.get("https://teamup.com/ks13d3ccc86a21d29e/events", timeout=30, headers={
         "Teamup-Token": api_key
     })
     resp.raise_for_status()
     raw_data = resp.json()
     for item in raw_data["events"]:
+        # handles some funny business with how the names are formatted
         name = item["title"]
         in_name_info = ""
         if name.startswith("Pottruck Courts"):
