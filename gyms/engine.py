@@ -23,10 +23,14 @@ def get_events():
         # handles some funny business with how the names are formatted
         name = item["title"]
         in_name_info = ""
+        if name.endswith("Hours"):
+            name = name.replace(" Hours", "")
         if name.startswith("Pottruck Courts"):
             name = "Pottruck Courts"
         elif name.startswith("Pottruck Hours"):
             name = "Pottruck"
+        elif name.startswith("Membership"):
+            name = "Membership Services"
         elif name.endswith(" - CLOSED"):
             name = name.replace(" - CLOSED", "")
             in_name_info = "closed"
