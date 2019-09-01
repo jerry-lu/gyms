@@ -7,10 +7,12 @@ import requests
 import iso8601
 import time
 
+
 def to_local(utc_datetime):
     now_timestamp = time.time()
     offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
     return utc_datetime + offset
+
 
 def get_events():
     # insert the api key from teamup.com/api-keys/ 
@@ -25,25 +27,30 @@ def get_events():
         in_name_info = ""
         if name.endswith("Hours"):
             name = name.replace(" Hours", "")
-        if name.startswith("Pottruck Courts"):
+        elif name.startswith("CLOSED - "):
+            name = name.replace("CLOSED - ", "")
+            in_name_info = "closed"
+        elif name.endswith(" - CLOSED"):
+            name = name.replace(" - CLOSED", "")
+            in_name_info = "closed"
+        elif name.endswith("-CLOSED"):
+            name = name.replace("-CLOSED", "")
+            in_name_info = "closed"
+
+        if name.startswith("Pottruck Court"):
             name = "Pottruck Courts"
         elif name.startswith("Pottruck Hours"):
             name = "Pottruck"
         elif name.startswith("Membership"):
             name = "Membership Services"
-        elif name.endswith(" - CLOSED"):
-            name = name.replace(" - CLOSED", "")
-            in_name_info = "closed"
-        elif name.endswith("-CLOSED"):
-            name = name.replace("-CLOSED","")
-            in_name_info = "closed"
         all_day = item["all_day"]
         date = iso8601.parse_date(item["start_dt"])
+        notes = item["notes"]
         if not all_day:
             start = to_local(iso8601.parse_date(item["start_dt"]))
             end = to_local(iso8601.parse_date(item["end_dt"]))
-            e = Event(name = name, all_day = all_day, date = date, start = start, end = end)
+            e = Event(name=name, all_day=all_day, date=date, start=start, end=end, notes=notes)
             e.save()
         else:
-            e = Event(name = name, all_day = all_day, date = date, in_name_info = in_name_info)
+            e = Event(name = name, all_day = all_day, date = date, in_name_info=in_name_info, notes=notes)
             e.save()

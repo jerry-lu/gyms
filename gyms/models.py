@@ -11,6 +11,7 @@ class Event(models.Model):
     date = models.DateField(default = timezone.now)
     start = models.DateTimeField(blank = True, null = True)
     end = models.DateTimeField(blank = True, null = True)
+    notes = models.CharField(max_length=500, null=True)
 
     def __str__(self):
        return self.name

@@ -34,6 +34,9 @@
                             {% endif %}
                             <p class="card-text">Hours Today: {{event.start.time}} – {{event.end.time}}</p>
                         {% endif %}
+                        {% if event.notes %}
+                            <p class="card-text">Note: {{event.notes|striptags}}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
