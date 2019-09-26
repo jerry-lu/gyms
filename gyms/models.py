@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from datetime import datetime
-import pytz
 
 
 class Event(models.Model):
@@ -22,6 +21,3 @@ class EventTime(models.Model):
                               related_name="times")
     start = models.DateTimeField()
     end = models.DateTimeField()
-
-    def __unicode__(self):
-        return u'%s' % self.since.strftime('%Y-%m-%d %H:%M')

@@ -1,11 +1,11 @@
 import re
 import os
 import time
-import requests
 from datetime import datetime, timedelta
 
 import iso8601
 import pytz
+import requests
 
 from gyms.models import Event, EventTime
 from gyms.config import api_key
