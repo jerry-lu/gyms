@@ -32,7 +32,10 @@ def format_titles(name):
     elif name.endswith("-CLOSED"):
         name = name.replace("-CLOSED", "")
         in_name_info = "closed"
-
+    if name.endswith("Morning"):
+        name = name.replace(" - Morning", "")
+    if name.endswith("Evening"):
+        name = name.replace(" - Evening", "")
     if name.startswith("Pottruck Court"):
         name = "Pottruck Courts"
     elif name.startswith("Pottruck Hours"):
