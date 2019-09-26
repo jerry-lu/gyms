@@ -1,21 +1,25 @@
-from gyms.models import Event
-from gyms.config import api_key
-from datetime import datetime
-from django.core.exceptions import ObjectDoesNotExist
 import re
 import os
-import requests
-import iso8601
 import time
+import requests
+from datetime import datetime, timedelta
+
+import iso8601
+import pytz
+
+from gyms.models import Event, EventTime
+from gyms.config import api_key
 
 
 def to_local(utc_datetime):
     now_timestamp = time.time()
-    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(
+                                                                now_timestamp)
     return utc_datetime + offset
 
 
-def format_titles(name):  # returns name and info
+def format_titles(name):  
+    # handles some funny business with how the names are formatted
     in_name_info = ""
     if name.endswith("Hours"):
         name = name.replace(" Hours", "")
@@ -38,6 +42,28 @@ def format_titles(name):  # returns name and info
     return name, in_name_info
 
 
+def is_open(event):
+    if(not event.all_day):
+        times = event.times_set.all()
+        now = pytz.utc.localize(datetime.now())
+        for time in times:
+            if now < time.end and now > time.start:
+                return True
+        return False
+    else:
+        return event.in_name_info != "closed"
+
+
+def is_closing(event):
+    if(event.open_now()):
+        now = pytz.utc.localize(datetime.now())
+        times = event.times_set.all()
+        for time in times:
+            if time.end >= now and time.end <= now + timedelta(hours=1):
+                return True
+        return False
+
+
 def get_events():
     # insert the api key from teamup.com/api-keys/ 
     resp = requests.get("https://teamup.com/ks13d3ccc86a21d29e/events", 
@@ -45,7 +71,6 @@ def get_events():
     resp.raise_for_status()
     raw_data = resp.json()
     for item in raw_data["events"]:
-        # handles some funny business with how the names are formatted
         name, in_name_info = format_titles(item["title"])
         all_day = item["all_day"]
         date = iso8601.parse_date(item["start_dt"])
@@ -61,6 +86,12 @@ def get_events():
         if not all_day:
             start = to_local(iso8601.parse_date(item["start_dt"]))
             end = to_local(iso8601.parse_date(item["end_dt"]))
-            e.start = start
-            e.end = end
+            times = EventTime(event=e, start=start, end=end)
+            times.save
+        e.save()
+
+    events = list(Event.objects.all())
+    for e in events:
+        e.open_now = is_open(e)
+        e.closing_soon = is_closing(e)
         e.save()
