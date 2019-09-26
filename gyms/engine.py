@@ -44,7 +44,7 @@ def format_titles(name):
 
 def is_open(event):
     if(not event.all_day):
-        times = event.times_set.all()
+        times = event.eventtime_set.all()
         now = pytz.utc.localize(datetime.now())
         for time in times:
             if now < time.end and now > time.start:
@@ -55,9 +55,9 @@ def is_open(event):
 
 
 def is_closing(event):
-    if(event.open_now()):
+    if(event.open_now):
         now = pytz.utc.localize(datetime.now())
-        times = event.times_set.all()
+        times = event.eventtime_set.all()
         for time in times:
             if time.end >= now and time.end <= now + timedelta(hours=1):
                 return True
@@ -87,7 +87,7 @@ def get_events():
             start = to_local(iso8601.parse_date(item["start_dt"]))
             end = to_local(iso8601.parse_date(item["end_dt"]))
             times = EventTime(event=e, start=start, end=end)
-            times.save
+            times.save()
         e.save()
 
     events = list(Event.objects.all())
