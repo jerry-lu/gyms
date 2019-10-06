@@ -1,5 +1,3 @@
-import re
-import os
 import time
 from datetime import datetime, timedelta
 
@@ -18,7 +16,7 @@ def to_local(utc_datetime):
     return utc_datetime + offset
 
 
-def format_titles(name):  
+def format_titles(name):
     # handles some funny business with how the names are formatted
     in_name_info = ""
     if name.endswith("Hours"):
@@ -49,8 +47,8 @@ def is_open(event):
     if(not event.all_day):
         times = event.eventtime_set.all()
         now = pytz.utc.localize(datetime.now())
-        for time in times:
-            if now < time.end and now > time.start:
+        for t in times:
+            if now < t.end and now > t.start:
                 return True
         return False
     else:
@@ -61,29 +59,26 @@ def is_closing(event):
     if(event.open_now):
         now = pytz.utc.localize(datetime.now())
         times = event.eventtime_set.all()
-        for time in times:
-            if time.end >= now and time.end <= now + timedelta(hours=1):
+        for t in times:
+            if t.end >= now and t.end <= now + timedelta(hours=1):
                 return True
         return False
 
 
 def get_events():
-    # insert the api key from teamup.com/api-keys/ 
-    resp = requests.get("https://teamup.com/ks13d3ccc86a21d29e/events", 
+    # insert the api key from teamup.com/api-keys/
+    resp = requests.get("https://teamup.com/ks13d3ccc86a21d29e/events",
                         timeout=30, headers={"Teamup-Token": api_key})
     resp.raise_for_status()
     raw_data = resp.json()
     for item in raw_data["events"]:
         name, in_name_info = format_titles(item["title"])
         all_day = item["all_day"]
-        date = iso8601.parse_date(item["start_dt"])
         notes = item["notes"]
 
-        e, created = Event.objects.get_or_create(
-            name=name
-        )
+        e, created = Event.objects.get_or_create(name=name,
+                                                 date=datetime.today())
         e.all_day = all_day
-        e.date = date
         e.in_name_info = in_name_info
         e.notes = notes
         if not all_day:
@@ -98,3 +93,5 @@ def get_events():
         e.open_now = is_open(e)
         e.closing_soon = is_closing(e)
         e.save()
+        if e.date != datetime.today().date():
+            e.delete()
