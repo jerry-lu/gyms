@@ -20,7 +20,7 @@ def to_local(utc_datetime):
 def format_titles(name):
     # handles some funny business with how the names are formatted
     in_name_info = ""
-    name = name.replace(" Hours", "")
+    name = name.replace("Hours", "").strip()
 
     if re.search(r"\s*-*\s*CLOSED\s*-*\s*", name) is not None:
         name = re.sub(r"\s*-*\s*CLOSED\s*-*\s*", "", name)

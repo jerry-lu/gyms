@@ -14,7 +14,7 @@
     <div class="row">
         {% for event in events %}
         <div class="card-deck">
-                <div class="card" style="width: 20rem;">
+                <div class="card" style="width: 17rem;">
                     <img class="card-img-top" src="{% static 'gyms/'|add:event.name|add:'.jpg' %}" alt="{{event.name}} image." >
                     <div class="card-body">
                         {% if event.all_day %}
