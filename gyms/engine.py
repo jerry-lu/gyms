@@ -20,17 +20,16 @@ def to_local(utc_datetime):
 def format_titles(name):
     # handles some funny business with how the names are formatted
     in_name_info = ""
-    name = name.replace("Hours", "").strip()
+    name = name.replace("Hours", "")
 
     if re.search(r"\s*-*\s*CLOSED\s*-*\s*", name) is not None:
         name = re.sub(r"\s*-*\s*CLOSED\s*-*\s*", "", name)
         in_name_info = "closed"
-
-    if name.endswith("Morning"):
-        name = name.replace(" - Morning", "")
-    if name.endswith("Evening"):
-        name = name.replace(" - Evening", "")
-    return name, in_name_info
+    if re.search(r"\s*-*\s*Morning\s*", name) is not None:
+        name = re.sub(r"\s*-*\s*Morning\s*", "", name)
+    if re.search(r"\s*-*\s*Evening\s*", name) is not None:
+        name = re.sub(r"\s*-*\s*Evening\s*", "", name)
+    return name.strip(), in_name_info
 
 
 def is_open(event):
