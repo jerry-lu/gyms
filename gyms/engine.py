@@ -29,6 +29,9 @@ def format_titles(name):
         name = re.sub(r"\s*-*\s*Morning\s*", "", name)
     if re.search(r"\s*-*\s*Evening\s*", name) is not None:
         name = re.sub(r"\s*-*\s*Evening\s*", "", name)
+    if re.search(r"\s*Sheer\s", name) is not None:
+        name = re.sub(r"\s*Sheer\s", "Sheerr ", name)
+
     return name.strip(), in_name_info
 
 
